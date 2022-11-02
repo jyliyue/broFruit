@@ -18,6 +18,20 @@ class Assets {
             loader.add(key, imgs[key])
         })
 
+        const titleStyle = new PIXI.TextStyle({
+            fontFamily: 'Arial',
+            fontSize: 64,
+            fill: 'white',
+            stroke: '#ff3300',
+            strokeThickness: 4,
+            dropShadow: true,
+            dropShadowColor: '#000000',
+            dropShadowBlur: 4,
+            dropShadowAngle: Math.PI / 6,
+            dropShadowDistance: 6
+        })
+        assets.titleStyle = titleStyle
+
         const textStyle = new PIXI.TextStyle({
             fontFamily: 'Arial',
             fontSize: 36,

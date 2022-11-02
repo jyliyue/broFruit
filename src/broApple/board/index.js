@@ -22,9 +22,9 @@ class Board {
         boardWindow.anchor.x = 0.5
         boardWindow.x = 400
         boardWindow.y = 100
-        const title = new PIXI.Text('BroFruit Game', this.assets.textStyle)
+        const title = new PIXI.Text('BroFruit 水果兄弟', this.assets.titleStyle)
         title.anchor.x = 0.5
-        title.y = 100
+        title.y = 70
         boardWindow.addChild(title)
         const historyScore = new PIXI.Text(
             '最高记录：' + this.historyScore,
@@ -38,11 +38,11 @@ class Board {
             this.assets.textStyle
         )
         score.anchor.x = 0.5
-        score.y = 240
+        score.y = 250
         boardWindow.addChild(score)
         const btn = new PIXI.Sprite(this.assets.btn)
         btn.anchor.x = 0.5
-        btn.y = 300
+        btn.y = 320
         const btnText = new PIXI.Text(this.btnText, this.assets.textStyle)
         btnText.anchor.x = 0.5
         btnText.y = 25
