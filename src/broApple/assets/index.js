@@ -11,9 +11,8 @@ const imgs = {
 }
 
 class Assets {
-    constructor() {
+    constructor(loader) {
         const assets = {}
-        const loader = new PIXI.Loader()
         Object.keys(imgs).forEach((key) => {
             loader.add(key, imgs[key])
         })
@@ -52,10 +51,7 @@ class Assets {
             })
         })
 
-        return {
-            loader,
-            assets
-        }
+        return assets
     }
 }
 

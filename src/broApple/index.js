@@ -10,8 +10,9 @@ import Count from './count'
 
 class Brotato {
     constructor() {
-        this.app = null
-        this.assets = null
+        this.app = new PIXI.Application()
+        this.loader = new PIXI.Loader()
+        this.assets = new Assets(this.loader)
         this.board = null
         this.role = null
         this.operate = null
@@ -27,17 +28,12 @@ class Brotato {
     }
 
     init = () => {
-        this.app = new PIXI.Application(800, 600)
         document.body.appendChild(this.app.view)
-
-        const { loader, assets } = new Assets()
-        this.assets = assets
-        loader.onComplete.add(() => {
-            console.log('complete')
+        this.loader.onComplete.add(() => {
             const bg = new PIXI.TilingSprite(
-                assets.bg,
-                window.innerWidth,
-                window.innerHeight
+                this.assets.bg,
+                800,
+                600
             )
             this.app.stage.addChild(bg)
             this.stagePending()
