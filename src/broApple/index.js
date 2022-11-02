@@ -8,6 +8,7 @@ import Board from './board'
 import Assets from './assets'
 import Count from './count'
 
+
 class Brotato {
     constructor() {
         this.app = new PIXI.Application()
