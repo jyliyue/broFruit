@@ -7,6 +7,34 @@ const utils = {
             y: Math.random() * y
         }
         return position
+    },
+    checkHit: (obj, target) => {
+        let result = null
+        const c = target.width ? (obj.width + target.width) / 2 : 2
+        const a = obj.x - target.x
+        const b = obj.y - target.y
+        if (c * c > a * a + b * b) {
+            result = true
+        } else {
+            result = false
+        }
+        return result
+    },
+    setAnimate: (obj) => {
+        obj.animate = {
+            speed: Math.random() + 0.5,
+            target: utils.randomPosition(),
+            move: () => {
+                const { x, y } = obj.animate.target
+                const { speed } = obj.animate
+                if (!utils.checkHit(obj, obj.animate.target)) {
+                    obj.x = obj.x > x ? obj.x - speed : obj.x + speed
+                    obj.y = obj.y > y ? obj.y - speed : obj.y + speed
+                } else {
+                    obj.animate.target = utils.randomPosition()
+                }
+            }
+        }
     }
 }
 
@@ -61,7 +89,8 @@ function loadAssets() {
 /* 角色 */
 class Role {
     constructor(cate) {
-        const role = new PIXI.Sprite(cate)
+        this.role = new PIXI.Sprite(cate)
+        const role = this.role
         role.anchor.x = 0.5
         role.anchor.y = 0.5
         role.x = 400
@@ -137,6 +166,7 @@ class Role {
         }
         role.start = this.start
         role.stop = this.stop
+        role.isHited = this.isHited
         return role
     }
 
@@ -168,6 +198,10 @@ class Role {
         this.config.s.clear()
         this.config.d.clear()
     }
+
+    isHited = (target) => {
+        return utils.checkHit(this.role, target)
+    }
 }
 
 /* 子弹 */
@@ -190,6 +224,7 @@ class Monster {
         this.assets = options.assets
         const position = utils.randomPosition()
         const monster = this.createMonster(position)
+        utils.setAnimate(monster)
         const warn = this.createWarn(position)
 
         return {
@@ -342,6 +377,7 @@ class BroFruit {
         this.removeRole()
         this.removeBullet()
         this.removeAllMonster()
+        this.nextCount()
     }
 
     /* 添加背景 */
@@ -380,6 +416,10 @@ class BroFruit {
         this.count.nextStage()
     }
 
+    resetCount = () => {
+        this.count.reset()
+    }
+
     checkCount = () => {
         return this.count.currentTime === 0
     }
@@ -395,6 +435,7 @@ class BroFruit {
     removeRole = () => {
         this.role.stop()
         this.app.stage.removeChild(this.role)
+        this.role = null
     }
 
     addBullet = () => {
@@ -421,7 +462,6 @@ class BroFruit {
         this.warnList.push(warn)
         this.app.stage.addChild(warn)
         timer.addMonster = setTimeout(() => {
-            console.log(1);
             this.app.stage.removeChild(warn)
             this.warnList.shift()
             if (!this.board) {
@@ -430,6 +470,13 @@ class BroFruit {
                 this.addMonster()
             }
         }, 1000)
+    }
+
+    monsterScript = () => {
+        for (let i = this.monsterList.length - 1; i >= 0; i--) {
+            const monster = this.monsterList[i]
+            monster.animate.move()
+        }
     }
     
     removeMonster = (index) => {
@@ -447,6 +494,8 @@ class BroFruit {
             this.app.stage.removeChild(item)
         })
         this.monsterList = []
+        clearTimeout(timer.addMonster)
+        timer.addMonster = null
     }
 
     /* 流程模块 */
@@ -471,8 +520,6 @@ class BroFruit {
     }
 
     stagePass = () => {
-        this.resetAll()
-        this.nextCount()
         const options = {
             assets: this.assets,
             score: this.count.totalTime,
@@ -482,20 +529,23 @@ class BroFruit {
                 this.removeBoard()
             }
         }
-
+        this.resetAll()
+        this.nextCount()
         this.addBoard(options)
     }
 
     stageEnd = () => {
         const options = {
             assets: this.assets,
+            score: this.count.totalTime,
             btnText: '重新开始',
             btnCallBack: () => {
                 this.stageStart()
-                this.app.stage.removeChild(this.board)
+                this.removeBoard()
             }
         }
-
+        this.resetAll()
+        this.resetCount()
         this.addBoard(options)
     }
 
@@ -515,10 +565,15 @@ class BroFruit {
             this.stagePass()
             return false
         }
-        // /* 刷怪 */
-        // for (let monsterIdx = this.monsterList.length - 1; monsterIdx >= 0; monsterIdx--) {
-        //     const monster = this.monsterList[monsterIdx]
-        // }
+        /* 碰撞判断 */
+        const unHited = this.monsterList.every(item => !this.role.isHited(item))
+        if (!unHited) {
+            this.stageEnd()
+            return false
+        }
+        /* 怪物行动 */
+        this.monsterScript()
+        
     }
 }
 
