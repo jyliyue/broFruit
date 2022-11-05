@@ -38,6 +38,11 @@ const style = {
     })
 }
 
+/* 定时器 */
+const timer = {
+    addMonster: null
+}
+
 /* 加载游戏资源 */
 function loadAssets() {
     const imgs = {
@@ -62,7 +67,106 @@ class Role {
         role.x = 400
         role.y = 300
 
+        const width = 800
+        const height = 600
+        this.config = {
+            w: {
+                on: false,
+                timer: null,
+                move: () => {
+                    if (role.y <= role.width / 2) {
+                        return
+                    }
+                    role.y--
+                    this.config.w.timer = setTimeout(() => {
+                        this.config.w.move(role)
+                    })
+                },
+                clear: () => {
+                    clearTimeout(this.config.w.timer)
+                }
+            },
+            a: {
+                on: false,
+                timer: null,
+                move: () => {
+                    if (role.x <= role.width / 2) {
+                        return
+                    }
+                    role.x--
+                    this.config.a.timer = setTimeout(() => {
+                        this.config.a.move(role)
+                    })
+                },
+                clear: () => {
+                    clearTimeout(this.config.a.timer)
+                }
+            },
+            s: {
+                on: false,
+                timer: null,
+                move: () => {
+                    if (role.y >= height - role.width / 2) {
+                        return
+                    }
+                    role.y++
+                    this.config.s.timer = setTimeout(() => {
+                        this.config.s.move(role)
+                    })
+                },
+                clear: () => {
+                    clearTimeout(this.config.s.timer)
+                }
+            },
+            d: {
+                on: false,
+                timer: null,
+                move: () => {
+                    if (role.x >= width - role.width / 2) {
+                        return
+                    }
+                    role.x++
+                    this.config.d.timer = setTimeout(() => {
+                        this.config.d.move(role)
+                    })
+                },
+                clear: () => {
+                    clearTimeout(this.config.d.timer)
+                }
+            }
+        }
+        role.start = this.start
+        role.stop = this.stop
         return role
+    }
+
+    keydownHandle = (e) => {
+        const { key } = e
+        if (this.config[key] && !this.config[key].on) {
+            this.config[key].on = true
+            this.config[key].move()
+        }
+    }
+    keyupHandle = (e) => {
+        const { key } = e
+        if (this.config[key]) {
+            this.config[key].on = false
+            this.config[key].clear()
+        }
+    }
+
+    start = () => {
+        window.addEventListener('keydown', this.keydownHandle)
+        window.addEventListener('keyup', this.keyupHandle)
+    }
+
+    stop = () => {
+        window.removeEventListener('keydown', this.keydownHandle)
+        window.removeEventListener('keyup', this.keyupHandle)
+        this.config.w.clear()
+        this.config.a.clear()
+        this.config.s.clear()
+        this.config.d.clear()
     }
 }
 
@@ -221,6 +325,7 @@ class BroFruit {
         this.board = null
         this.count = new Count()
         this.monsterList = []
+        this.warnList = []
         this.bulletList = []
     }
 
@@ -236,7 +341,7 @@ class BroFruit {
         this.removeAnimate()
         this.removeRole()
         this.removeBullet()
-        this.removeMonster()
+        this.removeAllMonster()
     }
 
     /* 添加背景 */
@@ -258,6 +363,7 @@ class BroFruit {
 
     removeBoard = () => {
         this.app.stage.removeChild(this.board)
+        this.board = null
     }
 
     /* 计分模块 */
@@ -282,10 +388,12 @@ class BroFruit {
     addRole = () => {
         const role = new Role(this.assets.apple)
         this.role = role
+        this.role.start()
         this.app.stage.addChild(this.role)
     }
 
     removeRole = () => {
+        this.role.stop()
         this.app.stage.removeChild(this.role)
     }
 
@@ -310,10 +418,12 @@ class BroFruit {
         const { monster, warn } = new Monster({
             assets: this.assets
         })
-        
+        this.warnList.push(warn)
         this.app.stage.addChild(warn)
-        setTimeout(() => {
+        timer.addMonster = setTimeout(() => {
+            console.log(1);
             this.app.stage.removeChild(warn)
+            this.warnList.shift()
             if (!this.board) {
                 this.monsterList.push(monster)
                 this.app.stage.addChild(monster)
@@ -328,6 +438,17 @@ class BroFruit {
         this.monsterList.splice(index, 1)
     }
 
+    removeAllMonster = () => {
+        this.warnList.forEach((item) => {
+            this.app.stage.removeChild(item)
+        })
+        this.warnList = []
+        this.monsterList.forEach((item) => {
+            this.app.stage.removeChild(item)
+        })
+        this.monsterList = []
+    }
+
     /* 流程模块 */
     stagePending = () => { 
         const options = {
@@ -336,7 +457,7 @@ class BroFruit {
             btnText: '开始',
             btnCallBack: () => {
                 this.stageStart()
-                this.app.stage.removeChild(this.board)
+                this.removeBoard()
             }
         }
         this.addBoard(options)
@@ -358,7 +479,7 @@ class BroFruit {
             btnText: '恭喜过关',
             btnCallBack: () => {
                 this.stageStart()
-                this.app.stage.removeChild(this.board)
+                this.removeBoard()
             }
         }
 
@@ -394,10 +515,10 @@ class BroFruit {
             this.stagePass()
             return false
         }
-        /* 刷怪 */
-        for (let monsterIdx = this.monsterList.length - 1; monsterIdx >= 0; monsterIdx--) {
-            const monster = this.monsterList[monsterIdx]
-        }
+        // /* 刷怪 */
+        // for (let monsterIdx = this.monsterList.length - 1; monsterIdx >= 0; monsterIdx--) {
+        //     const monster = this.monsterList[monsterIdx]
+        // }
     }
 }
 
