@@ -35,6 +35,20 @@ const utils = {
                 }
             }
         }
+    },
+    getDistance: (obj, target) => {
+        const a = obj.x - target.x
+        const b = obj.y - target.y
+        return a * a + b * b
+    },
+    checkOut: (obj) => {
+        const width = 800
+        const height = 600
+        if (obj.x > width || obj.x < 0 || obj.y > height || obj.y < 0) {
+            return true
+        } else {
+            return false
+        }
     }
 }
 
@@ -167,6 +181,8 @@ class Role {
         role.start = this.start
         role.stop = this.stop
         role.isHited = this.isHited
+        role.confirmTarget = this.confirmTarget
+        role.setFire = this.setFire
         return role
     }
 
@@ -201,6 +217,41 @@ class Role {
 
     isHited = (target) => {
         return utils.checkHit(this.role, target)
+    }
+
+    confirmTarget = (targetList) => {
+        let target = null
+        let min = Infinity
+        targetList.forEach((item) => {
+            const distance = utils.getDistance(this.role, item)
+            if (min > distance) {
+                min = distance
+                target = item
+            }
+        })
+        return target
+    }
+
+    setFire = (obj, options) => {
+        const k = (options.target.y - obj.y) / (options.target.x - obj.x)
+
+        const target = {
+            x: options.target.x * 100 * (options.target.x - obj.x),
+            y: options.target.y * 100 * (options.target.y - obj.y),
+            k: k
+        }
+        // console.log(target);
+        obj.animate = {
+            speed: options.speed,
+            target: target,
+            move: () => {
+                const { x, y } = obj.animate.target
+                const k = Math.abs(obj.animate.target.k)
+                const speed = obj.animate.speed
+                obj.x = obj.x > x ? obj.x - speed : obj.x + speed
+                obj.y = obj.y > y ? obj.y - speed * k : obj.y + speed * k
+            }
+        }
     }
 }
 
@@ -310,11 +361,15 @@ class Board {
 /* 分数 */
 class Count {
     constructor() {
-        this.stageTime = 5
+        this.stageTime = 64
         this.currentTime = 0
         this.totalTime = 0
         this.timer = null
-        this.sprite = new PIXI.Text()
+        this.sprite = new PIXI.Text('', style.text)
+        this.sprite.anchor.x = 0.5
+        this.sprite.anchor.y = 0.5
+        this.sprite.x = 400
+        this.sprite.y = 50
     }
 
     going = () => {
@@ -362,6 +417,7 @@ class BroFruit {
         this.monsterList = []
         this.warnList = []
         this.bulletList = []
+        this.shootTime = 60
     }
 
     /* 初始化 */
@@ -375,7 +431,7 @@ class BroFruit {
     resetAll = () => {
         this.removeAnimate()
         this.removeRole()
-        this.removeBullet()
+        this.removeAllBullet()
         this.removeAllMonster()
         this.nextCount()
     }
@@ -439,19 +495,55 @@ class BroFruit {
     }
 
     addBullet = () => {
-        const bullet = new Bullet({
-            assets: this.assets,
-            target: this.role
-        })
-        this.bulletList.push(bullet)
-        this.app.stage.addChild(bullet)
+        const target = this.role.confirmTarget(this.monsterList)
+        if (target) {
+            const bullet = new Bullet({
+                assets: this.assets,
+                target: this.role
+            })
+            this.role.setFire(bullet, { target: target, speed: 5 })
+            this.bulletList.push(bullet)
+            this.app.stage.addChild(bullet)
+        }
     }
 
-    removeBullet = () => {
+    removeBullet = (index) => {
+        const bullet = this.bulletList[index]
+        this.app.stage.removeChild(bullet)
+        this.bulletList.splice(index, 1)
+    }
+
+    removeAllBullet = () => {
         this.bulletList.forEach((item) => {
             this.app.stage.removeChild(item)
         })
         this.bulletList = []
+        this.shootTime = 60
+    }
+
+    bulletScript = () => {
+        if (this.shootTime === 60) {
+            this.addBullet()
+            this.shootTime = 0
+        } else {
+            this.shootTime += 10
+        }
+
+        for (let i = this.bulletList.length - 1; i >= 0; i--) {
+            const bullet = this.bulletList[i]
+            if (utils.checkOut(bullet)) {
+                this.removeBullet(i)
+                continue
+            }
+            for (let j = this.monsterList.length - 1; j >= 0; j--) {
+                const monster = this.monsterList[j]
+                if (utils.checkHit(bullet, monster)) {
+                    this.removeBullet(i)
+                    this.removeMonster(j)
+                }
+            }
+            bullet.animate.move()
+        }
     }
 
     /* 怪物模块 */
@@ -573,7 +665,8 @@ class BroFruit {
         }
         /* 怪物行动 */
         this.monsterScript()
-        
+        /* 子弹动画 */
+        this.bulletScript()
     }
 }
 
