@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js'
+import gsap from "gsap"
 
 const utils = {
     randomPosition: (w = 800, y = 600) => {
@@ -229,29 +230,45 @@ class Role {
                 target = item
             }
         })
-        return target
+        // console.log(min);
+        if (min > 80000) {
+            return null
+        } else {
+            return target
+        }
     }
 
     setFire = (obj, options) => {
+        console.log(obj.x, obj.y);
+        console.log(options.target.x, options.target.y);
+        console.log('====');
         const k = (options.target.y - obj.y) / (options.target.x - obj.x)
 
         const target = {
-            x: options.target.x * 100 * (options.target.x - obj.x),
-            y: options.target.y * 100 * (options.target.y - obj.y),
+            x: options.target.x ,
+            y: options.target.y ,
             k: k
         }
-        // console.log(target);
-        obj.animate = {
-            speed: options.speed,
-            target: target,
-            move: () => {
-                const { x, y } = obj.animate.target
-                const k = Math.abs(obj.animate.target.k)
-                const speed = obj.animate.speed
-                obj.x = obj.x > x ? obj.x - speed : obj.x + speed
-                obj.y = obj.y > y ? obj.y - speed * k : obj.y + speed * k
-            }
-        }
+        const { x, y } = target
+        gsap.to(obj, {
+            // duration: 2,
+            y: y,
+            x: x
+        })
+
+
+        // obj.animate = {
+        //     speed: options.speed,
+        //     target: target,
+        //     move: () => {
+        //         const { x, y } = obj.animate.target
+        //         const k = Math.abs(obj.animate.target.k)
+        //         const speed = obj.animate.speed
+
+        //         obj.x = obj.x > x ? obj.x - speed : obj.x + speed
+        //         obj.y = obj.y > y ? obj.y - speed * k : obj.y + speed * k
+        //     }
+        // }
     }
 }
 
@@ -417,7 +434,7 @@ class BroFruit {
         this.monsterList = []
         this.warnList = []
         this.bulletList = []
-        this.shootTime = 60
+        this.shootTime = 120
     }
 
     /* 初始化 */
@@ -501,9 +518,10 @@ class BroFruit {
                 assets: this.assets,
                 target: this.role
             })
-            this.role.setFire(bullet, { target: target, speed: 5 })
             this.bulletList.push(bullet)
             this.app.stage.addChild(bullet)
+            this.role.setFire(bullet, { target: target, speed: 5 })
+            // bullet.animate.move()
         }
     }
 
@@ -518,11 +536,11 @@ class BroFruit {
             this.app.stage.removeChild(item)
         })
         this.bulletList = []
-        this.shootTime = 60
+        this.shootTime = 120
     }
 
     bulletScript = () => {
-        if (this.shootTime === 60) {
+        if (this.shootTime === 120) {
             this.addBullet()
             this.shootTime = 0
         } else {
@@ -542,7 +560,7 @@ class BroFruit {
                     this.removeMonster(j)
                 }
             }
-            bullet.animate.move()
+            // bullet.animate.move()
         }
     }
 
@@ -572,9 +590,12 @@ class BroFruit {
     }
     
     removeMonster = (index) => {
+        console.log(this.monsterList);
         const monster = this.monsterList[index]
         this.app.stage.removeChild(monster)
         this.monsterList.splice(index, 1)
+        console.log(this.monsterList);
+        console.log('====');
     }
 
     removeAllMonster = () => {
