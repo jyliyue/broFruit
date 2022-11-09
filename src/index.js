@@ -239,17 +239,28 @@ class Role {
     }
 
     setFire = (obj, options) => {
-        console.log(obj.x, obj.y);
-        console.log(options.target.x, options.target.y);
-        console.log('====');
-        const k = (options.target.y - obj.y) / (options.target.x - obj.x)
-
-        const target = {
-            x: options.target.x ,
-            y: options.target.y ,
-            k: k
+        // console.log(obj.x, obj.y);
+        // console.log(options.target.x, options.target.y);
+        // console.log('====');
+        let x = 0
+        let y = 0
+        const [ x1, y1, x2, y2 ] = [ obj.x, obj.y, options.target.x, options.target.y ]
+        if (x2 > x1 && y2 > y1) {
+            y = 600
+            x = (y - y1)*(x2 - x1)/(y2 - y1) + x1
+        } else if (x2 > x1 && y2 < y1) {
+            y = 0
+            x = (y - y1)*(x2 - x1)/(y2 - y1) + x1
+        } else if (x2 < x1 && y2 > y1) {
+            y = 600
+            x = (y - y1)*(x2 - x1)/(y2 - y1) + x1
+        } else if (x2 < x1 && y2 < y1) {
+            y = 0
+            x = (y - y1)*(x2 - x1)/(y2 - y1) + x1
         }
-        const { x, y } = target
+
+        
+
         gsap.to(obj, {
             // duration: 2,
             y: y,
