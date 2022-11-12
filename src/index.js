@@ -242,29 +242,31 @@ class Role {
         // console.log(obj.x, obj.y);
         // console.log(options.target.x, options.target.y);
         // console.log('====');
+        
         let x = 0
         let y = 0
         const [ x1, y1, x2, y2 ] = [ obj.x, obj.y, options.target.x, options.target.y ]
         if (x2 > x1 && y2 > y1) {
-            y = 600
+            y = 610
             x = (y - y1)*(x2 - x1)/(y2 - y1) + x1
         } else if (x2 > x1 && y2 < y1) {
-            y = 0
+            y = - 10
             x = (y - y1)*(x2 - x1)/(y2 - y1) + x1
         } else if (x2 < x1 && y2 > y1) {
-            y = 600
+            y = 610
             x = (y - y1)*(x2 - x1)/(y2 - y1) + x1
         } else if (x2 < x1 && y2 < y1) {
-            y = 0
+            y = - 10
             x = (y - y1)*(x2 - x1)/(y2 - y1) + x1
         }
 
         
-
+        const distance = Math.sqrt(utils.getDistance(obj, { x, y }))
         gsap.to(obj, {
-            // duration: 2,
+            duration: distance/options.speed,
             y: y,
-            x: x
+            x: x,
+            ease: "none"
         })
 
 
@@ -389,7 +391,8 @@ class Board {
 /* 分数 */
 class Count {
     constructor() {
-        this.stageTime = 64
+        this.stageTime = 12
+        this.addHard = 6
         this.currentTime = 0
         this.totalTime = 0
         this.timer = null
@@ -420,6 +423,7 @@ class Count {
     }
 
     reset = () => {
+        this.stageTime = 12
         this.currentTime = this.stageTime
         this.totalTime = 0
     }
@@ -430,7 +434,8 @@ class Count {
         if (historyScore < this.totalTime) {
             localStorage.setItem('score', this.totalTime)
         }
-        this.currentTime = this.stageTime
+        
+        this.currentTime = this.stageTime + this.addHard
     }
 }
 
@@ -445,7 +450,7 @@ class BroFruit {
         this.monsterList = []
         this.warnList = []
         this.bulletList = []
-        this.shootTime = 120
+        this.shootTime = 240
     }
 
     /* 初始化 */
@@ -531,7 +536,7 @@ class BroFruit {
             })
             this.bulletList.push(bullet)
             this.app.stage.addChild(bullet)
-            this.role.setFire(bullet, { target: target, speed: 5 })
+            this.role.setFire(bullet, { target: target, speed: 400 })
             // bullet.animate.move()
         }
     }
@@ -547,11 +552,11 @@ class BroFruit {
             this.app.stage.removeChild(item)
         })
         this.bulletList = []
-        this.shootTime = 120
+        this.shootTime = 240
     }
 
     bulletScript = () => {
-        if (this.shootTime === 120) {
+        if (this.shootTime === 240) {
             this.addBullet()
             this.shootTime = 0
         } else {
@@ -601,12 +606,12 @@ class BroFruit {
     }
     
     removeMonster = (index) => {
-        console.log(this.monsterList);
+        // console.log(this.monsterList);
         const monster = this.monsterList[index]
         this.app.stage.removeChild(monster)
         this.monsterList.splice(index, 1)
-        console.log(this.monsterList);
-        console.log('====');
+        // console.log(this.monsterList);
+        // console.log('====');
     }
 
     removeAllMonster = () => {
