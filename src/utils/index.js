@@ -1,3 +1,5 @@
+import gsap from "gsap"
+
 const utils = {
     randomPosition: (w = 800, y = 600) => {
         const position = {
@@ -19,20 +21,24 @@ const utils = {
         return result
     },
     setAnimate: (obj) => {
-        obj.animate = {
-            speed: Math.random() + 0.5,
-            target: utils.randomPosition(),
-            move: () => {
-                const { x, y } = obj.animate.target
-                const { speed } = obj.animate
-                if (!utils.checkHit(obj, obj.animate.target)) {
-                    obj.x = obj.x > x ? obj.x - speed : obj.x + speed
-                    obj.y = obj.y > y ? obj.y - speed : obj.y + speed
-                } else {
-                    obj.animate.target = utils.randomPosition()
-                }
+        const target = utils.randomPosition()
+        const { x, y } = target
+        const speed = 100
+        const distance = Math.sqrt(utils.getDistance(obj, { x, y }))
+        const duration = distance/speed
+        gsap.to(obj, {
+            duration: duration,
+            y: y,
+            x: x,
+            ease: "none"
+        })
+
+        setTimeout(() => {
+            if (obj) {
+                utils.setAnimate(obj)
             }
-        }
+        }, duration * 1000)
+
     },
     getDistance: (obj, target) => {
         const a = obj.x - target.x

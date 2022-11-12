@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js'
-import gsap from "gsap"
 
 import Board from './modules/Board'
 import Role from './modules/Role'
@@ -27,6 +26,7 @@ class BroFruit {
         this.warnList = []
         this.bulletList = []
         this.shootTime = 240
+        this.monsterTime = 6
     }
 
     /* 初始化 */
@@ -42,7 +42,7 @@ class BroFruit {
         this.removeRole()
         this.removeAllBullet()
         this.removeAllMonster()
-        this.nextCount()
+        // this.nextCount()
     }
 
     /* 添加背景 */
@@ -71,6 +71,11 @@ class BroFruit {
     addCount = () => {
         this.app.stage.addChild(this.count.sprite)
         this.count.start()
+    }
+
+    continueCount = () => {
+        this.app.stage.addChild(this.count.sprite)
+        this.count.continue()
     }
 
     stopCount = () => {
@@ -170,15 +175,10 @@ class BroFruit {
                 this.monsterList.push(monster)
                 this.app.stage.addChild(monster)
                 this.addMonster()
+                utils.setAnimate(monster)
+                // monster.move()
             }
         }, 1000)
-    }
-
-    monsterScript = () => {
-        for (let i = this.monsterList.length - 1; i >= 0; i--) {
-            const monster = this.monsterList[i]
-            monster.animate.move()
-        }
     }
     
     removeMonster = (index) => {
@@ -219,8 +219,21 @@ class BroFruit {
     
     stageStart = () => { 
         this.addRole()
-        this.addMonster()
+        const level = this.count.level
+        for (let i = level; i > 0; i--) {
+            this.addMonster()
+        }
         this.addCount()
+        this.addAnimate()
+    }
+
+    stageContinue = () => {
+        this.addRole()
+        const level = this.count.level
+        for (let i = level; i > 0; i--) {
+            this.addMonster()
+        }
+        this.continueCount()
         this.addAnimate()
     }
 
@@ -230,7 +243,7 @@ class BroFruit {
             score: this.count.totalTime,
             btnText: '恭喜过关',
             btnCallBack: () => {
-                this.stageStart()
+                this.stageContinue()
                 this.removeBoard()
             }
         }
@@ -276,8 +289,6 @@ class BroFruit {
             this.stageEnd()
             return false
         }
-        /* 怪物行动 */
-        this.monsterScript()
         /* 子弹动画 */
         this.bulletScript()
     }

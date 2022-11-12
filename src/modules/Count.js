@@ -3,9 +3,12 @@ import style from '../styles'
 
 /* 分数 */
 class Count {
+    static STAGETIME = 4
+    static ADDHARD = 2
     constructor() {
-        this.stageTime = 12
-        this.addHard = 6
+        this.stageTime = Count.STAGETIME
+        this.addHard = Count.ADDHARD
+        this.level = 1
         this.currentTime = 0
         this.totalTime = 0
         this.timer = null
@@ -26,7 +29,13 @@ class Count {
     }
 
     start = () => {
+        this.level = 1
         this.currentTime = this.stageTime
+        this.going()
+    }
+
+    continue = () => {
+        this.currentTime = this.stageTime + this.addHard
         this.going()
     }
 
@@ -36,19 +45,20 @@ class Count {
     }
 
     reset = () => {
-        this.stageTime = 12
+        this.stop()
+        this.level = 1
+        this.stageTime = Count.STAGETIME
         this.currentTime = this.stageTime
         this.totalTime = 0
     }
 
     nextStage = () => {
         this.stop()
+        this.level++
         const historyScore = localStorage.getItem('score') || 0
         if (historyScore < this.totalTime) {
             localStorage.setItem('score', this.totalTime)
         }
-        
-        this.currentTime = this.stageTime + this.addHard
     }
 }
 

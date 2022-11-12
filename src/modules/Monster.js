@@ -7,7 +7,6 @@ class Monster {
         this.assets = options.assets
         const position = utils.randomPosition()
         const monster = this.createMonster(position)
-        utils.setAnimate(monster)
         const warn = this.createWarn(position)
 
         return {
