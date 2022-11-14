@@ -21,6 +21,8 @@ class Monster {
         monster.anchor.y = 0.5
         monster.x = x
         monster.y = y  
+        monster.scale.x = 0.6
+        monster.scale.y = 0.6
         return monster
     }
 
@@ -30,6 +32,8 @@ class Monster {
         warn.anchor.y = 0.5
         warn.x = x
         warn.y = y
+        warn.scale.x = 0.5
+        warn.scale.y = 0.5
         return warn
     }
 }

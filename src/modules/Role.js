@@ -4,16 +4,21 @@ import utils from '../utils'
 
 /* 角色 */
 class Role {
-    constructor(cate) {
-        this.role = new PIXI.Sprite(cate)
+    constructor(options) {
+        this.options = options
+        this.role = new PIXI.Sprite(options.cate)
         const role = this.role
         role.anchor.x = 0.5
         role.anchor.y = 0.5
         role.x = 400
         role.y = 300
+        role.scale.x = 0.6
+        role.scale.y = 0.6
 
         const width = 800
         const height = 600
+        const speed = options.speed
+
         this.config = {
             w: {
                 on: false,
@@ -22,7 +27,7 @@ class Role {
                     if (role.y <= role.width / 2) {
                         return
                     }
-                    role.y--
+                    role.y -= speed
                     this.config.w.timer = setTimeout(() => {
                         this.config.w.move(role)
                     })
@@ -38,7 +43,7 @@ class Role {
                     if (role.x <= role.width / 2) {
                         return
                     }
-                    role.x--
+                    role.x -= speed
                     this.config.a.timer = setTimeout(() => {
                         this.config.a.move(role)
                     })
@@ -54,7 +59,7 @@ class Role {
                     if (role.y >= height - role.width / 2) {
                         return
                     }
-                    role.y++
+                    role.y += speed
                     this.config.s.timer = setTimeout(() => {
                         this.config.s.move(role)
                     })
@@ -70,7 +75,7 @@ class Role {
                     if (role.x >= width - role.width / 2) {
                         return
                     }
-                    role.x++
+                    role.x += speed
                     this.config.d.timer = setTimeout(() => {
                         this.config.d.move(role)
                     })
@@ -131,8 +136,7 @@ class Role {
                 target = item
             }
         })
-        // console.log(min);
-        if (min > 80000) {
+        if (min / 500 > this.options.range) {
             return null
         } else {
             return target
@@ -140,9 +144,6 @@ class Role {
     }
 
     setFire = (obj, options) => {
-        // console.log(obj.x, obj.y);
-        // console.log(options.target.x, options.target.y);
-        // console.log('====');
         
         let x = 0
         let y = 0
@@ -170,19 +171,6 @@ class Role {
             ease: "none"
         })
 
-
-        // obj.animate = {
-        //     speed: options.speed,
-        //     target: target,
-        //     move: () => {
-        //         const { x, y } = obj.animate.target
-        //         const k = Math.abs(obj.animate.target.k)
-        //         const speed = obj.animate.speed
-
-        //         obj.x = obj.x > x ? obj.x - speed : obj.x + speed
-        //         obj.y = obj.y > y ? obj.y - speed * k : obj.y + speed * k
-        //     }
-        // }
     }
 }
 

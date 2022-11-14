@@ -8,6 +8,20 @@ import Count from './modules/Count'
 import loadAssets from './utils/loadAssets'
 import utils from './utils'
 
+/* 更新日志 */
+class UpdateLog {
+    static list = [
+        '2022/11/13 过关提供属性升级，刷怪数量增加',
+        '2022/11/13 w,a,s,d操作移动水果兄弟,撑过时间进入下一关,难度,角色,武器系统开发中...'
+    ]
+    constructor() {
+        UpdateLog.list.forEach(txt => {
+            const p = document.createElement('p')
+            p.innerHTML = txt
+            document.body.appendChild(p)
+        })
+    }
+}
 
 /* 定时器 */
 const timer = {
@@ -16,16 +30,22 @@ const timer = {
 
 /* 水果兄弟 */
 class BroFruit {
+    static ROLECONFIG = {
+        speed: 0.5,
+        quick: 30,
+        range: 100
+    }
     constructor() {
         this.app = new PIXI.Application()
         this.assets = null
         this.role = null
+        this.roleConfig = BroFruit.ROLECONFIG
         this.board = null
         this.count = new Count()
         this.monsterList = []
         this.warnList = []
         this.bulletList = []
-        this.shootTime = 240
+        this.shootTime = this.roleConfig.quick
         this.monsterTime = 6
     }
 
@@ -33,6 +53,7 @@ class BroFruit {
     init = async () => {
         this.assets = await loadAssets()
         document.body.appendChild(this.app.view)
+        new UpdateLog()
         this.addBg()
         this.stagePending()
     }
@@ -96,7 +117,10 @@ class BroFruit {
 
     /* 角色模块 */
     addRole = () => {
-        const role = new Role(this.assets.apple)
+        const role = new Role({
+            cate: this.assets.apple,
+            ...this.roleConfig
+        })
         this.role = role
         this.role.start()
         this.app.stage.addChild(this.role)
@@ -133,15 +157,15 @@ class BroFruit {
             this.app.stage.removeChild(item)
         })
         this.bulletList = []
-        this.shootTime = 240
+        this.shootTime = this.roleConfig.quick
     }
 
     bulletScript = () => {
-        if (this.shootTime === 240) {
+        if (this.shootTime === this.roleConfig.quick) {
             this.addBullet()
             this.shootTime = 0
         } else {
-            this.shootTime += 10
+            this.shootTime += 1
         }
 
         for (let i = this.bulletList.length - 1; i >= 0; i--) {
@@ -206,8 +230,9 @@ class BroFruit {
     /* 流程模块 */
     stagePending = () => { 
         const options = {
+            type: 'start',
             assets: this.assets,
-            score: this.count.totalTime,
+            score: this.count.level,
             btnText: '开始',
             btnCallBack: () => {
                 this.stageStart()
@@ -238,24 +263,38 @@ class BroFruit {
     }
 
     stagePass = () => {
+        this.nextCount()
         const options = {
+            type: 'pass',
             assets: this.assets,
-            score: this.count.totalTime,
+            score: this.count.level,
             btnText: '恭喜过关',
-            btnCallBack: () => {
+            btnCallBack: (type) => {
+                switch (type) {
+                    case 'speed':
+                        this.roleConfig.speed = this.roleConfig.speed + this.roleConfig.speed * Math.random()
+                        break;
+                    case 'quick':
+                        this.roleConfig.quick --
+                        break;
+                    case 'range':
+                        this.roleConfig.range += 10
+                        break;
+                }
+                this.shootTime = this.roleConfig.quick
                 this.stageContinue()
                 this.removeBoard()
             }
         }
         this.resetAll()
-        this.nextCount()
         this.addBoard(options)
     }
 
     stageEnd = () => {
         const options = {
+            type: 'start',
             assets: this.assets,
-            score: this.count.totalTime,
+            score: this.count.level,
             btnText: '重新开始',
             btnCallBack: () => {
                 this.stageStart()
@@ -264,6 +303,7 @@ class BroFruit {
         }
         this.resetAll()
         this.resetCount()
+        this.roleConfig = BroFruit.ROLECONFIG
         this.addBoard(options)
     }
 
@@ -296,3 +336,7 @@ class BroFruit {
 
 const broApple = new BroFruit()
 broApple.init()
+
+
+
+

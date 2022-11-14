@@ -3,7 +3,7 @@ import style from '../styles'
 
 /* 分数 */
 class Count {
-    static STAGETIME = 4
+    static STAGETIME = 10
     static ADDHARD = 2
     constructor() {
         this.stageTime = Count.STAGETIME
@@ -55,9 +55,9 @@ class Count {
     nextStage = () => {
         this.stop()
         this.level++
-        const historyScore = localStorage.getItem('score') || 0
-        if (historyScore < this.totalTime) {
-            localStorage.setItem('score', this.totalTime)
+        const historyScore = localStorage.getItem('level') || 0
+        if (historyScore < this.level) {
+            localStorage.setItem('level', this.level)
         }
     }
 }
