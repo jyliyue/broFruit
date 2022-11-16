@@ -30,22 +30,15 @@ const timer = {
 
 /* 水果兄弟 */
 class BroFruit {
-    static ROLECONFIG = {
-        speed: 0.5,
-        quick: 30,
-        range: 100
-    }
     constructor() {
         this.app = new PIXI.Application()
         this.assets = null
         this.role = null
-        this.roleConfig = BroFruit.ROLECONFIG
         this.board = null
         this.count = new Count()
         this.monsterList = []
         this.warnList = []
         this.bulletList = []
-        this.shootTime = this.roleConfig.quick
         this.monsterTime = 6
     }
 
@@ -118,11 +111,10 @@ class BroFruit {
     /* 角色模块 */
     addRole = () => {
         const role = new Role({
-            cate: this.assets.apple,
-            ...this.roleConfig
+            cate: this.assets.apple
         })
         this.role = role
-        this.role.start()
+        this.role.start([this.addBullet])
         this.app.stage.addChild(this.role)
     }
 
@@ -133,6 +125,7 @@ class BroFruit {
     }
 
     addBullet = () => {
+        console.log(1111);
         const target = this.role.confirmTarget(this.monsterList)
         if (target) {
             const bullet = new Bullet({
@@ -157,16 +150,9 @@ class BroFruit {
             this.app.stage.removeChild(item)
         })
         this.bulletList = []
-        this.shootTime = this.roleConfig.quick
     }
 
     bulletScript = () => {
-        if (this.shootTime === this.roleConfig.quick) {
-            this.addBullet()
-            this.shootTime = 0
-        } else {
-            this.shootTime += 1
-        }
 
         for (let i = this.bulletList.length - 1; i >= 0; i--) {
             const bullet = this.bulletList[i]
@@ -272,16 +258,15 @@ class BroFruit {
             btnCallBack: (type) => {
                 switch (type) {
                     case 'speed':
-                        this.roleConfig.speed = this.roleConfig.speed + this.roleConfig.speed * Math.random()
+                        this.role.character.speed = this.role.character.speed + this.role.character.speed * Math.random()
                         break;
                     case 'quick':
-                        this.roleConfig.quick --
+                        this.role.character.quick --
                         break;
                     case 'range':
-                        this.roleConfig.range += 10
+                        this.role.character.range += 10
                         break;
                 }
-                this.shootTime = this.roleConfig.quick
                 this.stageContinue()
                 this.removeBoard()
             }
@@ -303,7 +288,7 @@ class BroFruit {
         }
         this.resetAll()
         this.resetCount()
-        this.roleConfig = BroFruit.ROLECONFIG
+        this.role.character = Role.CHARACTER
         this.addBoard(options)
     }
 

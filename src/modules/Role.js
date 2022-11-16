@@ -4,8 +4,14 @@ import utils from '../utils'
 
 /* 角色 */
 class Role {
+    static CHARACTER = {
+        speed: 0.5,
+        quick: 1,
+        range: 100
+    }
     constructor(options) {
         this.options = options
+        this.timer = null
         this.role = new PIXI.Sprite(options.cate)
         const role = this.role
         role.anchor.x = 0.5
@@ -14,10 +20,11 @@ class Role {
         role.y = 300
         role.scale.x = 0.6
         role.scale.y = 0.6
+        role.character = Role.CHARACTER
 
         const width = 800
         const height = 600
-        const speed = options.speed
+        const speed = role.character.speed
 
         this.config = {
             w: {
@@ -108,9 +115,14 @@ class Role {
         }
     }
 
-    start = () => {
+    start = (fns) => {
         window.addEventListener('keydown', this.keydownHandle)
         window.addEventListener('keyup', this.keyupHandle)
+        this.timer = setTimeout(() => {
+            fns.forEach(fn => {
+                fn()
+            })
+        }, this.role.character.speed)
     }
 
     stop = () => {
@@ -120,6 +132,7 @@ class Role {
         this.config.a.clear()
         this.config.s.clear()
         this.config.d.clear()
+        clearTimeout(this.timer)
     }
 
     isHited = (target) => {
