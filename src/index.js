@@ -5,23 +5,9 @@ import Role from './modules/Role'
 import Bullet from './modules/Bullet'
 import Monster from './modules/Monster'
 import Count from './modules/Count'
+import UpdateLog from './modules/UpdateLog'
 import loadAssets from './utils/loadAssets'
 import utils from './utils'
-
-/* 更新日志 */
-class UpdateLog {
-    static list = [
-        '2022/11/13 过关提供属性升级，刷怪数量增加',
-        '2022/11/13 w,a,s,d操作移动水果兄弟,撑过时间进入下一关,难度,角色,武器系统开发中...'
-    ]
-    constructor() {
-        UpdateLog.list.forEach(txt => {
-            const p = document.createElement('p')
-            p.innerHTML = txt
-            document.body.appendChild(p)
-        })
-    }
-}
 
 /* 定时器 */
 const timer = {
@@ -114,18 +100,17 @@ class BroFruit {
             cate: this.assets.apple
         })
         this.role = role
-        this.role.start([this.addBullet])
+        this.role.start()
+        // this.role.start([this.addBullet])
         this.app.stage.addChild(this.role)
     }
 
     removeRole = () => {
         this.role.stop()
         this.app.stage.removeChild(this.role)
-        this.role = null
     }
 
     addBullet = () => {
-        console.log(1111);
         const target = this.role.confirmTarget(this.monsterList)
         if (target) {
             const bullet = new Bullet({
@@ -288,7 +273,6 @@ class BroFruit {
         }
         this.resetAll()
         this.resetCount()
-        this.role.character = Role.CHARACTER
         this.addBoard(options)
     }
 
