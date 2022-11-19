@@ -1,15 +1,17 @@
 import * as PIXI from 'pixi.js'
 import config from '../config'
 import style from "../styles"
+import Btn from './Btn'
 
 class Board {
     constructor() {
         this.assets = null
-        this.stage = 1
+        this.window = null
     }
 
     init = (assets) => {
         this.assets = assets
+        this.window = this.setWindow()
     }
 
     setWindow = () => {
@@ -34,41 +36,49 @@ class Board {
         return hostoryScore
     }
 
-    setCurrentStage = () => {
-        const currentStage = new PIXI.Text('当前关卡：' + this.stage, style.text)
+    setCurrentStage = (stageLevel) => {
+        const currentStage = new PIXI.Text('当前关卡：' + stageLevel, style.text)
         currentStage.y = 0
         currentStage.anchor.set(0.5)
         return currentStage
     }
 
-    setStartBtn = (callBack) => {
-        const btn = new PIXI.Sprite(this.assets.btn)
-        btn.y = 100
-        btn.anchor.set(0.5)
-        const btnText = new PIXI.Text('开始游戏', style.text)
-        btnText.anchor.set(0.5)
-        btn.addChild(btnText)
-        btn.interactive = true
-        btn.on('click', () => {
-            callBack()
-        })
-        return btn
-    }
-
     getStartBoard = (options) => {
-        const window = this.setWindow()
         const title = this.setTitle('BroFruit 水果兄弟')
-        window.addChild(title)
+        this.window.addChild(title)
         const hostoryScore = this.setHistoryScore()
-        window.addChild(hostoryScore)
-        const currentStage = this.setCurrentStage()
-        window.addChild(currentStage)
-        const startBtn = this.setStartBtn(options.callBack)
-        window.addChild(startBtn)
-        return window
+        this.window.addChild(hostoryScore)
+        const currentStage = this.setCurrentStage(options.stageLevel)
+        this.window.addChild(currentStage)
+        const startBtn = new Btn({
+            asset: this.assets.btn,
+            x: 0,
+            y: 100,
+            text: '开始游戏',
+            callBack: options.callBack
+        })
+        this.window.addChild(startBtn)
+        return this.window
     }
     
-    getPassBoard = () => { }
+    getPassBoard = (options) => {
+        this.window = this.setWindow()
+        const title = this.setTitle('恭喜过关')
+        this.window.addChild(title)
+        const hostoryScore = this.setHistoryScore()
+        this.window.addChild(hostoryScore)
+        const currentStage = this.setCurrentStage(options.stageLevel)
+        this.window.addChild(currentStage)
+        const startBtn = new Btn({
+            asset: this.assets.btn,
+            x: 0,
+            y: 100,
+            text: '下一关',
+            callBack: options.callBack
+        })
+        this.window.addChild(startBtn)
+        return this.window
+    }
     
     getRestartBoard = () => { }
 }

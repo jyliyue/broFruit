@@ -4,10 +4,12 @@ import config from '../config'
 class Role {
     constructor() {
         this.assets = null
+        this.role = null
     }
 
     init = (assets) => {
         this.assets = assets
+        this.setRole()
     }
 
     setRole = () => {
@@ -15,12 +17,11 @@ class Role {
         role.position.set(config.width / 2, config.height / 2)
         role.anchor.set(0.5)
         role.scale.set(0.6)
-        return role
+        this.role = role
     }
 
     getRole = () => {
-        const role = this.setRole()
-        return role
+        return this.role
     }
 }
 
