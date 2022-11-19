@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js'
 import Loader from './class/Loader'
 import config from './config'
 import Board from './class/Board'
+import Role from './class/Role'
 
 
 class BroFruit {
@@ -9,6 +10,7 @@ class BroFruit {
         this.app = new PIXI.Application(config)
         this.loader = new Loader()
         this.board = new Board()
+        this.role = new Role()
         this.assets = null
     }
 
@@ -17,7 +19,8 @@ class BroFruit {
         await this.loading()
         this.addBg()
         this.board.init(this.assets)
-        this.addStartBoard()
+        this.role.init(this.assets)
+        this.stagePending()
     }
 
     loading = async () => {
@@ -35,14 +38,25 @@ class BroFruit {
         this.app.stage.addChild(bg)
     }
 
-    addStartBoard = () => {
+    addRole = () => {
+        const role = this.role.getRole()
+        this.app.stage.addChild(role)
+    }
+
+    /* 流程 */
+    stagePending = () => {
         const options = {
             callBack: () => {
                 this.app.stage.removeChild(board)
+                this.stageStart()
             }
         }
         const board = this.board.getStartBoard(options)
         this.app.stage.addChild(board)
+    }
+
+    stageStart = () => {
+        this.addRole()
     }
 }
 
