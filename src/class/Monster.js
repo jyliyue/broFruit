@@ -100,6 +100,10 @@ class Monster {
         this.removeMonster()
         this.removeWarn()
     }
+
+    getMonsterList = () => {
+        return this.monsterList
+    }
 }
 
 export default Monster

@@ -99,6 +99,19 @@ class BroFruit {
         const board = this.board.getPassBoard(options)
         this.app.stage.addChild(board)
     }
+    stageEnd = () => {
+        this.count.end()
+        this.resetStage()
+        const options = {
+            stageLevel: this.count.currentLevel,
+            callBack: () => {
+                this.app.stage.removeChild(board)
+                this.stageStart()
+            }
+        }
+        const board = this.board.getStartBoard(options)
+        this.app.stage.addChild(board)
+    }
     resetStage = () => {
         this.removeRole()
         this.removeCount()
@@ -119,6 +132,12 @@ class BroFruit {
         /* 过关判断 */
         if (this.count.checkPass()) {
             this.stagePass()
+            return false
+        }
+        /* 碰撞判断 */
+        const unHited = this.monster.getMonsterList().every(item => !this.role.isHited(item))
+        if (!unHited) {
+            this.stageEnd()
             return false
         }
     }

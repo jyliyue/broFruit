@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js'
 import config from '../config'
 import Operate from './Operate'
+import utils from '../utils'
 
 class Role {
     static CHARACTER = {
@@ -31,6 +32,10 @@ class Role {
 
     getRole = () => {
         return this.role
+    }
+
+    isHited = (target) => {
+        return utils.checkHit(this.role, target)
     }
 }
 
