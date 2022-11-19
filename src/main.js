@@ -43,11 +43,13 @@ class BroFruit {
     /* 角色 */
     addRole = () => {
         const role = this.role.getRole()
+        role.start()
         this.app.stage.addChild(role)
     }
 
     removeRole = () => {
         const role = this.role.getRole()
+        role.stop()
         this.app.stage.removeChild(role)
     }
     /* 计数 */

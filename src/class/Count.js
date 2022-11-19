@@ -3,7 +3,7 @@ import style from "../styles"
 import config from '../config'
 
 class Count {
-    static STAGE_TIME = 2
+    static STAGE_TIME = 4
     static STAGE_LEVEL = 1
     static ADD_HARD = 2
     constructor() {
