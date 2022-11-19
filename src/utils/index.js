@@ -43,7 +43,7 @@ const utils = {
     getDistance: (obj, target) => {
         const a = obj.x - target.x
         const b = obj.y - target.y
-        return a * a + b * b
+        return Math.sqrt(a * a + b * b)
     },
     checkOut: (obj) => {
         const width = 800

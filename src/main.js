@@ -4,6 +4,7 @@ import config from './config'
 import Board from './class/Board'
 import Role from './class/Role'
 import Count from './class/Count'
+import Monster from './class/Monster'
 
 
 class BroFruit {
@@ -13,6 +14,7 @@ class BroFruit {
         this.board = new Board()
         this.role = new Role()
         this.count = new Count()
+        this.monster = new Monster()
         this.assets = null
     }
 
@@ -22,6 +24,7 @@ class BroFruit {
         this.addBg()
         this.board.init(this.assets)
         this.role.init(this.assets)
+        this.monster.init(this.assets, this.app)
         this.count.init()
         this.stagePending()
     }
@@ -80,6 +83,7 @@ class BroFruit {
     stageStart = () => {
         this.addRole()
         this.addCount()
+        this.monster.start()
         this.runScript()
     }
     stagePass = () => {
@@ -99,6 +103,7 @@ class BroFruit {
         this.removeRole()
         this.removeCount()
         this.removeScript()
+        this.monster.remove()
     }
 
     /* 运行脚本 */
