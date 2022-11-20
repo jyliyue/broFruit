@@ -5,6 +5,7 @@ import Board from './class/Board'
 import Role from './class/Role'
 import Count from './class/Count'
 import Monster from './class/Monster'
+import utils from './utils'
 
 
 class BroFruit {
@@ -23,7 +24,7 @@ class BroFruit {
         await this.loading()
         this.addBg()
         this.board.init(this.assets)
-        this.role.init(this.assets)
+        this.role.init(this.assets, this.app)
         this.monster.init(this.assets, this.app)
         this.count.init()
         this.stagePending()
@@ -43,18 +44,52 @@ class BroFruit {
         )
         this.app.stage.addChild(bg)
     }
+
     /* 角色 */
     addRole = () => {
         const role = this.role.getRole()
         role.start()
         this.app.stage.addChild(role)
+        this.startShoot()
+    }
+
+    startShoot = () => {
+        this.role.timer = setTimeout(() => {
+            this.role.confirmTarget(this.monster.getMonsterList())
+            this.startShoot()
+        }, this.role.character.quick)
+    }
+
+    stopShoot = () => {
+        clearTimeout(this.role.timer)
+    }
+
+    bulletHit = () => {
+        const bulletList = this.role.getBulletList()
+        const monsterList = this.monster.getMonsterList()
+        for (let i = bulletList.length - 1; i >= 0; i--) {
+            const bullet = bulletList[i]
+            if (utils.checkOut(bullet)) {
+                this.role.removeBullet(i)
+                continue
+            }
+            for (let j = monsterList.length - 1; j >= 0; j--) {
+                const monster = monsterList[j]
+                if (utils.checkHit(bullet, monster)) {
+                    this.role.removeBullet(i)
+                    this.monster.removeMonster(j)
+                }
+            }
+        }
     }
 
     removeRole = () => {
         const role = this.role.getRole()
         role.stop()
+        this.stopShoot()
         this.app.stage.removeChild(role)
     }
+
     /* 计数 */
     addCount = () => {
         const count = this.count.getCount()
@@ -134,12 +169,14 @@ class BroFruit {
             this.stagePass()
             return false
         }
-        /* 碰撞判断 */
+        /* 角色碰撞 */
         const unHited = this.monster.getMonsterList().every(item => !this.role.isHited(item))
         if (!unHited) {
             this.stageEnd()
             return false
         }
+        /* 子弹碰撞 */
+        this.bulletHit()
     }
 }
 

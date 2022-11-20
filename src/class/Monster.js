@@ -25,11 +25,17 @@ class Monster {
         return monster
     }
 
-    removeMonster = () => {
+    removeMonsters = () => {
         this.monsterList.forEach(item => {
             this.app.stage.removeChild(item)
         })
         this.monsterList = []
+    }
+
+    removeMonster = (index) => {
+        const monster = this.monsterList[index]
+        this.app.stage.removeChild(monster)
+        this.monsterList.splice(index, 1)
     }
 
     createWarn = ({ x, y }) => {
@@ -97,7 +103,7 @@ class Monster {
 
     remove = () => {
         clearTimeout(this.timer)
-        this.removeMonster()
+        this.removeMonsters()
         this.removeWarn()
     }
 
