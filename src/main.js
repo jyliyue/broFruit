@@ -121,12 +121,25 @@ class BroFruit {
         this.monster.start()
         this.runScript()
     }
+    
     stagePass = () => {
         this.count.pass()
         this.resetStage()
         const options = {
             stageLevel: this.count.currentLevel,
-            callBack: () => {
+            callBack: (type) => {
+                console.log(type)
+                switch (type) {
+                    case 'speed':
+                        this.role.character.speed = this.role.character.speed + this.role.character.speed * Math.random()
+                        break;
+                    case 'quick':
+                        this.role.character.quick --
+                        break;
+                    case 'range':
+                        this.role.character.range += 10
+                        break;
+                }
                 this.app.stage.removeChild(board)
                 this.stageStart()
             }
@@ -134,6 +147,7 @@ class BroFruit {
         const board = this.board.getPassBoard(options)
         this.app.stage.addChild(board)
     }
+
     stageEnd = () => {
         this.count.end()
         this.resetStage()
@@ -147,6 +161,7 @@ class BroFruit {
         const board = this.board.getStartBoard(options)
         this.app.stage.addChild(board)
     }
+
     resetStage = () => {
         this.removeRole()
         this.removeCount()

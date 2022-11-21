@@ -63,20 +63,45 @@ class Board {
     
     getPassBoard = (options) => {
         this.window = this.setWindow()
-        const title = this.setTitle('恭喜过关')
+        const title = this.setTitle('选择属性升级进入下一关')
         this.window.addChild(title)
         const hostoryScore = this.setHistoryScore()
         this.window.addChild(hostoryScore)
         const currentStage = this.setCurrentStage(options.stageLevel)
         this.window.addChild(currentStage)
-        const startBtn = new Btn({
+        const upSpeedBtn = new Btn({
             asset: this.assets.btn,
-            x: 0,
-            y: 100,
-            text: '下一关',
+            x: -180,
+            y: 150,
+            scale: 0.6,
+            text: '移速提升',
+            icon: this.assets.speed,
+            params: 'speed',
             callBack: options.callBack
         })
-        this.window.addChild(startBtn)
+        this.window.addChild(upSpeedBtn)
+        const upQuickBtn = new Btn({
+            asset: this.assets.btn,
+            x: 0,
+            y: 150,
+            scale: 0.6,
+            text: '攻速提升',
+            icon: this.assets.quick,
+            params: 'quick',
+            callBack: options.callBack
+        })
+        this.window.addChild(upQuickBtn)
+        const upRangeBtn = new Btn({
+            asset: this.assets.btn,
+            x: 180,
+            y: 150,
+            scale: 0.6,
+            text: '攻击范围',
+            icon: this.assets.range,
+            params: 'range',
+            callBack: options.callBack
+        })
+        this.window.addChild(upRangeBtn)
         return this.window
     }
     
