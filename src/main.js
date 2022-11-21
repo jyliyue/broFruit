@@ -121,7 +121,7 @@ class BroFruit {
         this.monster.start()
         this.runScript()
     }
-    
+
     stagePass = () => {
         this.count.pass()
         this.resetStage()
@@ -158,7 +158,7 @@ class BroFruit {
                 this.stageStart()
             }
         }
-        const board = this.board.getStartBoard(options)
+        const board = this.board.getRestartBoard(options)
         this.app.stage.addChild(board)
     }
 

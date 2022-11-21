@@ -84,15 +84,29 @@ class Operate {
         }
     }
 
+    getKey = (e) => {
+        const map = {
+            ArrowUp: 'w',
+            ArrowDown: 's',
+            ArrowLeft: 'a',
+            ArrowRight: 'd'
+        }
+        if (e.key.length > 1) {
+            return map[e.key]
+        } else {
+            return e.key
+        }
+    }
+
     keydownHandle = (e) => {
-        const { key } = e
+        const key = this.getKey(e)
         if (this.config[key] && !this.config[key].on) {
             this.config[key].on = true
             this.config[key].move()
         }
     }
     keyupHandle = (e) => {
-        const { key } = e
+        const key = this.getKey(e)
         if (this.config[key]) {
             this.config[key].on = false
             this.config[key].clear()
